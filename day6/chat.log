@@ -1,0 +1,13 @@
+Client1 joined the chat.
+Client2 joined the chat.
+Client3 joined the chat.
+Client1: hi
+Client2: hi
+Client3: hi
+Client1 left the chat
+Client2 left the chat
+Client4 joined the chat.
+Client4: hello
+Client3: hello
+Client5 joined the chat.
+Client5: hi
