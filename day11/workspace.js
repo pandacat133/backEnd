@@ -7,14 +7,7 @@ app.use(cookieParser());
 
 app.get('/', (req, res) => {
     res.cookie('myCookie', 'myValue');
-    res.cookie('rememberMe', 1, {expires: new Date(Date.now() + 90000),
-                                 httpOnly: true,
-                                 secure: true
-                                });
-    res.cookie('rememberMe', 1, {maxAge: 90000,
-                                 httpOnly: true,
-                                 secure: true
-                                });
+    res.cookie('rememberMe', 1);
     console.log(req.cookies);
     res.send('Hello World');
 });
