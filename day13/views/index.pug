@@ -1,0 +1,37 @@
+doctype html
+html
+    body
+        ul
+            each fruit in list
+                li
+                    a(href='fruit/'+fruit) #{fruit}
+
+    //html
+    //    head
+    //        title My Users
+    //    body
+    //        include date/date.pug
+    //        h2 List of users:
+    //        include users/users.pug
+
+    //html
+    //    include includes/head.pug
+    //    body
+    //        h1= title
+    //        p I love pug!
+    //        include includes/foot.pug
+
+    //extends ./layouts/layout
+    //
+    //block headContent
+    //    title= title
+    //block bodyContent
+    //    h1= message
+    //    h2 Coding #{partial}
+
+    //html
+    //    head
+    //        title= title
+    //    body
+    //        h1(class='myClass', id='myId')= message
+    //        h2.myClass.mySecondClass#myId Coding #{partial}

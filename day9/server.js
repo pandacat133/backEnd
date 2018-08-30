@@ -203,8 +203,8 @@ app.post('/addRecipe', (req, res) => {
         let prevData = JSON.parse(data);
         let dataObj = {
             userId: userId,
-            recipePrice: recipePrice,
             recipe: recipe,
+            recipePrice: recipePrice,
             recipeTime: recipeTime
         };
 
@@ -215,9 +215,9 @@ app.post('/addRecipe', (req, res) => {
         jsonArray.recipes.push(dataObj);
         fs.writeFile(jsonFile, JSON.stringify(jsonArray), 'utf8', (err) => {
             if (err) console.log(err);
+            res.sendFile(jsonFile);
         });
     });
-    res.sendFile(jsonFile);
 });
 
 app.post('/login', (req, res, next) => {
