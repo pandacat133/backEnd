@@ -5,11 +5,13 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
+const Strategy = require('passport-google-oauth20').Strategy;
 const path = require('path');
 
 //CONST VARIABLES:
 
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const fs = require('fs');
 const app = express();
 const now = new Date();
@@ -31,15 +33,15 @@ let jsonArray = {
 
 //FUNCTIONS:
 
-function findByUsername(username, callback) {
-    for (let i = 0, len = users.length; i < len; i++) {
-        const user = users[i];
-        if (user.username === username) {
-            return callback(null, user);
-        }
-    }
-    return callback(null, null);
-}
+    // function findByUsername(username, callback) {
+    //     for (let i = 0, len = users.length; i < len; i++) {
+    //         const user = users[i];
+    //         if (user.username === username) {
+    //             return callback(null, user);
+    //         }
+    //     }
+    //     return callback(null, null);
+    // }
 
 const isAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
@@ -55,35 +57,39 @@ app.get('/tryagain', (req, res) => {
     res.sendFile(tryagainPath);
 });
 
+function findOrCreate(username, callback) {
+    for (let i = 0, len = users.length; i < len; i++) {
+        const user = users[i];
+        if (user.username === username) {
+            return callback(null, user);
+        }else{
+            console.log(`new user: ${username}`);
+            let newuser = {};
+            newuser.id = 3;
+            newuser.username = username;
+
+            users.push(newuser);
+            return callback(null, newuser);
+        }
+    }
+}
+
 //PASSPORT:
 
-passport.use(new LocalStrategy({
-        usernameField: 'username',
-        passwordField: 'password'
+passport.use(new Strategy({
+        clientID: GOOGLE_CLIENT_ID,
+        clientSecret: GOOGLE_CLIENT_SECRET,
+        callbackURL: `http://localhost:3000/auth/google/callback`,
+        passReqToCallback: true
     },
-    (username, password, done) => {
-        const invalidLoginMessage = "Invaild user name and/or password.";
-        findByUsername(username, (err, user) => {
-            if (err) {
-                return done(err);
-            }
-            if (!user) {
-                console.log(`Missing user object: ${invalidLoginMessage}`);
-                return done(null, false, {message: invalidLoginMessage});
-            } else {
-                if (user.password === password) {
-                    console.log('valid username and password');
-                    return done(null, user);
-                } else {
-                    console.log(`User name: ${user.username} Password: ${user.password} :: ${password} valid username but password is wrong`);
-                    return done(null, false, {message: invalidLoginMessage});
-                }
-            }
+    (request, accessToken, refreshToken, profile, done) => {
+        findOrCreate({ googleId: profile.id }, (err, user) =>{
+            return done(err, user);
         });
     }
 ));
 
-passport.serializeUser((user, done) => {
+passport.serializeUser((user, done)=>{
     console.log(`saving user to session: ${JSON.stringify(user)}`);
     done(null, user.id);
 });
@@ -169,6 +175,32 @@ app.get('/protected', isAuthenticated, function (req, res) {
     res.send('You are authorized.  This is protected.');
 });
 
+app.get('/auth/google',
+    passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] }));
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', {
+        successRedirect: '/',
+        failureRedirect: '/login'
+    }));
+
+app.get('/logout', (req, res)=>{
+    req.logout();
+    res.redirect('/');
+});
+
+app.get('/protected/:pages', isAuthenticated, function(req, res){
+    //res.send(`You are authorized.  This is protected. ${req.params.pages}`);
+    res.sendFile(path.join(__dirname, 'protected', req.params.pages));
+});
+
+app.get('/showcars', isAuthenticated, function(req, res){
+    let carJsonFilePath = path.join(__dirname, 'protected', 'cars.json');
+    let data = fs.readFileSync(carJsonFilePath, 'utf8');
+    console.log(`return json file`);
+    res.json(JSON.parse(data));
+});
+
 //POST REQUESTS:
 
 app.post('/addRecipe', (req, res) => {
@@ -220,23 +252,23 @@ app.post('/addRecipe', (req, res) => {
     });
 });
 
-app.post('/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        console.log(err, user, info);
-        if (user) {
-            console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
-            console.log(`req.user: ${JSON.stringify(req.user)}`);
-            req.login(user, (err) => {
-                if(err) throw err;
-                console.log(`After LOGIN: req.session.passport: ${JSON.stringify(req.session.passport)}`);
-                console.log(`req.user: ${JSON.stringify(req.user)} \n ${req.isAuthenticated()}`);
-                res.sendFile(path.join(__dirname + '/protected/welcome.html'));
-            });
-        } else {
-            res.redirect('/tryagain');
-        }
-    })(req, res, next);
-});
+    // app.post('/login', (req, res, next) => {
+    //     passport.authenticate('local', (err, user, info) => {
+    //         console.log(err, user, info);
+    //         if (user) {
+    //             console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
+    //             console.log(`req.user: ${JSON.stringify(req.user)}`);
+    //             req.login(user, (err) => {
+    //                 if(err) throw err;
+    //                 console.log(`After LOGIN: req.session.passport: ${JSON.stringify(req.session.passport)}`);
+    //                 console.log(`req.user: ${JSON.stringify(req.user)} \n ${req.isAuthenticated()}`);
+    //                 res.sendFile(path.join(__dirname + '/protected/welcome.html'));
+    //             });
+    //         } else {
+    //             res.redirect('/tryagain');
+    //         }
+    //     })(req, res, next);
+    // });
 
 //LISTEN REQUESTS:
 

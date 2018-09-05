@@ -1,10 +1,30 @@
-doctype html
+include ./mixin
+
 html
+    head
+        title Basic Form
     body
-        ul
-            each fruit in list
-                li
-                    a(href='fruit/'+fruit) #{fruit}
+        h1 Fill out this form
+
+        form(action='/login', method='POST')
+            div
+                +textInput('userId', 'User Id: ')
+            div
+                +textInput('name', 'Name: ')
+            div
+                +textInput('email', 'Email: ')
+            div
+                +textInput('age', 'Age: ')
+            div
+                input(type='submit' value='Submit')
+
+    //doctype html
+    //html
+    //    body
+    //        ul
+    //            each fruit in list
+    //                li
+    //                    a(href='fruit/'+fruit) #{fruit}
 
     //html
     //    head

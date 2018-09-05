@@ -35,6 +35,10 @@ app.get('/fruit/:fruit', (req, res) => {
     res.end(`You clicked on ${req.params.fruit}`);
 });
 
+app.post('/login', (req, res) => {
+    res.end('Hey you! Users should be here!')
+});
+
 app.listen(3000, () => {
    console.log('Listening on port 3000');
 });
