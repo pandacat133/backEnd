@@ -1,0 +1,24 @@
+{
+  "name": "npm-sample-fall2018",
+  "version": "1.0.0",
+  "description": "An app for us to learn how to NPM all the things",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.16.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manithree/npm-sample-fall2018.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/manithree/npm-sample-fall2018/issues"
+  },
+  "homepage": "https://github.com/manithree/npm-sample-fall2018#readme"
+}
